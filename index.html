@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="ADV Rider - The adventure motorcycle touring app built by riders for riders. Offline navigation, SOS, crash detection, and 29 survival features.">
+<meta name="theme-color" content="#080808">
+<title>ADV Rider — The Adventure Motorcycle App</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;800&family=Inter:wght@400;500&display=swap');
+:root{
+--bg:#080808;--card:#111111;--accent:#FF4500;--cyan:#00CED1;--gold:#FFD700;
+--text:#F0EDE8;--text2:#9A9690;--border:rgba(255,255,255,0.06);--glow:rgba(255,69,0,0.4);
+--font-h:'Space Grotesk',sans-serif;--font-b:'Inter',sans-serif;
+--max-w:1280px;--ease:cubic-bezier(.25,.46,.45,.94);--dur:0.6s;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:16px;line-height:1.7;overflow-x:hidden}
+/* Noise texture */
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+/* Scroll progress */
+#progress{position:fixed;top:0;left:0;height:2px;background:var(--accent);z-index:999;width:0;transition:none}
+/* Utility */
+.container{max-width:var(--max-w);margin:0 auto;padding:0 24px}
+section{padding:72px 0;position:relative}
+.section-num{position:absolute;top:20px;right:20px;font-family:var(--font-h);font-size:clamp(100px,15vw,200px);font-weight:800;color:rgba(255,255,255,0.03);line-height:1;pointer-events:none;z-index:0}
+.section-line{height:1px;background:linear-gradient(90deg,var(--accent),transparent 40%);margin:0}
+.eyebrow{font-family:var(--font-h);font-size:12px;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);margin-bottom:16px}
+h2{font-family:var(--font-h);font-size:clamp(34px,5vw,52px);font-weight:700;letter-spacing:-0.03em;line-height:1.1;margin-bottom:24px}
+.reveal{opacity:0;transform:translateY(40px);transition:opacity var(--dur) var(--ease),transform var(--dur) var(--ease)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+a{color:var(--cyan);text-decoration:none}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:8px;font-family:var(--font-b);font-size:14px;font-weight:500;cursor:pointer;border:none;transition:all .3s}
+.btn-primary{background:var(--accent);color:var(--bg)}
+.btn-primary:hover{filter:brightness(1.15)}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid rgba(255,255,255,0.2)}
+.btn-ghost:hover{border-color:var(--glow)}
+/* Cards */
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;transition:transform .3s,border-color .3s}
+.card:hover{transform:translateY(-4px);border-color:var(--glow)}
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 0;transition:all .3s}
+nav.scrolled{background:rgba(8,8,8,0.8);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;max-width:var(--max-w);margin:0 auto;padding:0 24px}
+.logo{font-family:var(--font-h);font-size:24px;font-weight:700;line-height:1.1}
+.logo span{color:var(--accent)}
+.logo small{display:block;font-size:11px;color:var(--text2);font-weight:400;font-family:var(--font-b)}
+.nav-links{display:none;list-style:none;gap:32px;align-items:center}
+.nav-links a{color:var(--text2);font-size:14px;position:relative;transition:color .3s}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:100%;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .3s}
+.nav-links a:hover,.nav-links a.active{color:var(--text)}
+.nav-links a.active::after{transform:scaleX(1)}
+.nav-cta{display:none}
+.hamburger{display:flex;flex-direction:column;gap:6px;cursor:pointer;z-index:201;background:none;border:none;padding:4px}
+.hamburger span{display:block;width:24px;height:2px;background:var(--text);transition:all .3s}
+.hamburger.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+.hamburger.open span:nth-child(2){opacity:0}
+.hamburger.open span:nth-child(3){transform:rotate(-45deg) translate(6px,-6px)}
+.mobile-menu{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px;opacity:0;pointer-events:none;transition:opacity .3s}
+.mobile-menu.open{opacity:1;pointer-events:auto}
+.mobile-menu a{font-family:var(--font-h);font-size:32px;color:var(--text);opacity:0;transform:translateY(20px);transition:all .4s}
+.mobile-menu.open a{opacity:1;transform:translateY(0)}
+@media(min-width:768px){
+section{padding:120px 0}
+.nav-links{display:flex}
+.nav-cta{display:inline-flex}
+.hamburger{display:none}
+}
+/* HERO */
+.hero{min-height:100svh;display:flex;align-items:center;position:relative;overflow:hidden;padding-top:100px}
+.hero-grid{position:absolute;inset:0;overflow:hidden;z-index:0}
+.hero-grid::before{content:'';position:absolute;width:200%;height:200%;top:-50%;left:-50%;background:repeating-linear-gradient(transparent,transparent 60px,rgba(255,255,255,0.03) 60px,rgba(255,255,255,0.03) 61px),repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(255,255,255,0.03) 60px,rgba(255,255,255,0.03) 61px);transform:perspective(500px) rotateX(45deg);animation:gridMove 8s linear infinite}
+@keyframes gridMove{to{transform:perspective(500px) rotateX(45deg) translateY(60px)}}
+.hero-content{position:relative;z-index:1;display:grid;gap:48px}
+.hero-pill{display:inline-block;background:var(--accent);color:var(--bg);font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;padding:6px 16px;border-radius:20px}
+.hero h1{font-family:var(--font-h);font-size:clamp(48px,8vw,96px);font-weight:800;line-height:0.95;letter-spacing:-0.03em}
+.hero h1 em{color:var(--accent);font-style:normal}
+.hero-sub{font-size:clamp(15px,1.5vw,18px);color:var(--text2);max-width:480px;min-height:60px}
+.hero-ctas{display:flex;gap:16px;flex-wrap:wrap}
+.hero-stats{display:flex;gap:24px;flex-wrap:wrap;margin-top:16px}
+.hero-stats .stat{font-size:13px;color:var(--text2)}
+.hero-stats .stat strong{color:var(--gold);font-size:18px;display:block}
+/* Phone mockup */
+.phone-mock{width:280px;height:500px;border:2px solid rgba(255,255,255,0.1);border-radius:32px;background:#0d1117;position:relative;overflow:hidden;margin:0 auto}
+.phone-mock .route{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
+.phone-mock .dot{width:12px;height:12px;background:var(--accent);border-radius:50%;position:absolute;top:40%;left:55%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,69,0,0.6)}70%{box-shadow:0 0 0 16px rgba(255,69,0,0)}}
+.notif{position:absolute;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 16px;font-size:12px;white-space:nowrap;animation:bob 3s ease-in-out infinite}
+.notif:nth-child(2){top:15%;right:-30px;animation-delay:.5s}
+.notif:nth-child(3){bottom:30%;left:-20px;animation-delay:1s}
+.notif:nth-child(4){bottom:10%;right:-10px;animation-delay:1.5s}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@media(min-width:768px){.hero-content{grid-template-columns:1fr 1fr;align-items:center}}
+/* Problem section */
+.problems-grid{display:grid;gap:24px;grid-template-columns:1fr}
+@media(min-width:768px){.problems-grid{grid-template-columns:repeat(3,1fr)}}
+.problem-card .icon{font-size:32px;color:var(--accent);margin-bottom:16px}
+.problem-card h3{font-size:18px;font-weight:700;margin-bottom:8px;font-family:var(--font-h)}
+.problem-card p{font-size:14px;color:var(--text2);margin-bottom:16px}
+.problem-card .fix{color:var(--cyan);font-size:13px;font-weight:500}
+/* Features tabs */
+.tabs{display:flex;gap:8px;overflow-x:auto;margin-bottom:40px;padding-bottom:8px}
+.tab-btn{background:none;border:none;color:var(--text2);font-family:var(--font-h);font-size:14px;padding:10px 20px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .3s}
+.tab-btn.active{color:var(--text);border-bottom-color:var(--accent)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.features-grid{display:grid;gap:16px;grid-template-columns:1fr}
+@media(min-width:768px){.features-grid{grid-template-columns:repeat(3,1fr)}}
+.feat-card{padding:24px}
+.feat-card .badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;margin-bottom:12px}
+.badge-p1{background:#4A1B0C;color:var(--accent)}
+.badge-p2{background:#412402;color:var(--gold)}
+.badge-p3{background:#04342C;color:var(--cyan)}
+.feat-card h4{font-size:16px;font-weight:500;margin-bottom:8px}
+.feat-card .prob{font-size:13px;font-style:italic;color:var(--text2);margin-bottom:4px}
+.feat-card .prob b{color:var(--accent);font-style:normal}
+.feat-card .sol{font-size:13px;color:var(--text2)}
+/* Badge shimmer */
+.badge{position:relative;overflow:hidden}
+.badge::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);animation:shimmer 4s infinite}
+@keyframes shimmer{0%,100%{left:-100%}50%{left:100%}}
+/* Dashboard */
+.dashboard-layout{display:grid;gap:32px}
+@media(min-width:768px){.dashboard-layout{grid-template-columns:1.5fr 1fr}}
+.fake-map{background:#0d1117;border-radius:16px;min-height:400px;position:relative;overflow:hidden;border:1px solid var(--border)}
+.fake-map .grid-lines{position:absolute;inset:0;background:repeating-linear-gradient(transparent,transparent 40px,#1a2030 40px,#1a2030 41px),repeating-linear-gradient(90deg,transparent,transparent 40px,#1a2030 40px,#1a2030 41px)}
+.fake-map .map-route{position:absolute;top:20%;left:15%;width:70%;height:60%}
+.fake-map .map-dot{width:14px;height:14px;background:var(--accent);border-radius:50%;position:absolute;top:30%;left:60%;animation:pulse 2s infinite}
+.fake-map .hazard{width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:14px solid var(--accent);position:absolute}
+.stat-cards{display:flex;flex-direction:column;gap:16px}
+.stat-card{padding:20px}
+.stat-card .label{font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em}
+.stat-card .value{font-size:36px;font-weight:700;font-family:var(--font-h);color:var(--text)}
+.stat-card .value.cyan{color:var(--cyan)}
+.callouts{display:grid;gap:24px;grid-template-columns:1fr;margin-top:48px}
+@media(min-width:768px){.callouts{grid-template-columns:repeat(3,1fr)}}
+.callout{text-align:center;padding:24px}
+.callout i{font-size:28px;color:var(--accent);margin-bottom:12px;display:block}
+.callout h4{font-size:16px;margin-bottom:8px}
+.callout p{font-size:13px;color:var(--text2)}
+/* Safety */
+.safety-layout{display:grid;gap:48px}
+@media(min-width:768px){.safety-layout{grid-template-columns:1fr 1fr}}
+.sos-btn{width:180px;height:180px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--font-h);font-size:48px;font-weight:800;color:var(--bg);margin:0 auto 24px;position:relative;animation:sosPulse 2s infinite}
+@keyframes sosPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,69,0,0.5)}70%{box-shadow:0 0 0 30px rgba(255,69,0,0)}}
+.safety-cards{display:flex;flex-direction:column;gap:16px}
+/* Offline */
+.offline-layout{display:grid;gap:48px}
+@media(min-width:768px){.offline-layout{grid-template-columns:1fr 1fr}}
+.check-list{list-style:none;display:flex;flex-direction:column;gap:16px;margin:24px 0}
+.check-list li{font-size:15px;display:flex;gap:12px;align-items:flex-start}
+.check-list li::before{content:'✓';color:var(--gold);font-weight:700;flex-shrink:0}
+.offline-map-card{background:#0d1117;border-radius:16px;min-height:350px;position:relative;overflow:hidden;border:1px solid var(--border)}
+.offline-badge{position:absolute;top:16px;right:16px;background:#22c55e;color:#000;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px}
+/* Group */
+.group-layout{display:grid;gap:32px}
+@media(min-width:768px){.group-layout{grid-template-columns:1fr 1.2fr 1fr}}
+.squad-map{background:#0d1117;border-radius:16px;min-height:350px;position:relative;border:1px solid var(--border)}
+.rider-dot{position:absolute;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.group-feat h4{font-size:15px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.group-feat p{font-size:13px;color:var(--text2);margin-bottom:20px}
+.group-feat i{color:var(--accent)}
+/* Journal */
+.journal-layout{display:grid;gap:48px}
+@media(min-width:768px){.journal-layout{grid-template-columns:1fr 1fr}}
+.phone-journal{width:280px;height:520px;border:2px solid rgba(255,255,255,0.1);border-radius:32px;background:var(--card);padding:24px 20px;margin:0 auto;overflow:hidden}
+.phone-journal .trip-name{font-family:var(--font-h);font-size:18px;font-weight:700}
+.phone-journal .trip-date{font-size:12px;color:var(--text2);margin-bottom:12px}
+.phone-journal .route-thumb{height:80px;background:#0d1117;border-radius:8px;margin-bottom:12px}
+.phone-journal .stats-row{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+.phone-journal .stats-row div{background:var(--bg);border-radius:8px;padding:8px;text-align:center;font-size:11px;color:var(--text2)}
+.phone-journal .stats-row div strong{display:block;font-size:16px;color:var(--text)}
+.phone-journal .photos{display:flex;gap:8px;margin-bottom:12px}
+.phone-journal .photos div{flex:1;height:48px;border-radius:6px}
+.phone-journal .badges-row{display:flex;gap:6px;flex-wrap:wrap}
+.phone-journal .badges-row span{font-size:10px;background:#412402;color:var(--gold);padding:3px 10px;border-radius:10px}
+.journal-feats{display:flex;flex-direction:column;gap:24px}
+.journal-feats .jf{display:flex;gap:16px;align-items:flex-start}
+.journal-feats .jf i{color:var(--accent);font-size:20px;margin-top:3px;flex-shrink:0}
+.journal-feats .jf h4{font-size:15px;margin-bottom:4px}
+.journal-feats .jf p{font-size:13px;color:var(--text2)}
+/* Community */
+.community-cards{display:grid;gap:24px;grid-template-columns:1fr}
+@media(min-width:768px){.community-cards{grid-template-columns:repeat(3,1fr)}}
+.comm-card{text-align:center;padding:40px 24px}
+.comm-card i{font-size:36px;color:var(--accent);margin-bottom:16px;display:block}
+.comm-card h3{font-size:20px;font-family:var(--font-h);margin-bottom:8px}
+.comm-card p{font-size:14px;color:var(--text2)}
+.big-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:48px;text-align:center}
+@media(min-width:768px){.big-stats{grid-template-columns:repeat(4,1fr)}}
+.big-stats .bs .num{font-size:clamp(28px,4vw,42px);font-weight:800;font-family:var(--font-h);color:var(--gold)}
+.big-stats .bs .lbl{font-size:13px;color:var(--text2)}
+/* Pricing */
+.pricing-grid{display:grid;gap:24px;grid-template-columns:1fr}
+@media(min-width:768px){.pricing-grid{grid-template-columns:repeat(3,1fr)}}
+.price-card{padding:40px 32px;position:relative}
+.price-card.featured{border-color:var(--glow);box-shadow:0 0 40px rgba(255,69,0,0.08)}
+.price-card .popular{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--accent);color:var(--bg);font-size:12px;font-weight:700;padding:4px 16px;border-radius:20px}
+.price-card h3{font-family:var(--font-h);font-size:22px;margin-bottom:8px}
+.price-card .price{font-size:36px;font-weight:800;font-family:var(--font-h);margin-bottom:4px}
+.price-card .period{font-size:13px;color:var(--text2);margin-bottom:24px}
+.price-card ul{list-style:none;display:flex;flex-direction:column;gap:12px;margin-bottom:32px}
+.price-card ul li{font-size:14px;color:var(--text2);display:flex;gap:10px;align-items:center}
+.price-card ul li::before{content:'✓';color:var(--accent);font-weight:700}
+.toggle-wrap{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:48px}
+.toggle-wrap span{font-size:14px;color:var(--text2)}
+.toggle-wrap span.active{color:var(--text)}
+.toggle{width:48px;height:26px;background:var(--card);border-radius:13px;border:1px solid var(--border);cursor:pointer;position:relative}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--accent);transition:transform .3s}
+.toggle.annual::after{transform:translateX(22px)}
+/* Download CTA */
+.cta-section{background:var(--accent);padding:80px 0;text-align:center}
+.cta-section h2{color:var(--bg);font-size:clamp(40px,6vw,72px)}
+.cta-section p{color:rgba(0,0,0,0.7);margin-bottom:32px;font-size:18px}
+.store-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.store-btn{background:var(--bg);color:var(--text);padding:14px 28px;border-radius:8px;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:500}
+.store-btn i{font-size:22px}
+.cta-note{margin-top:24px;font-size:13px;color:rgba(0,0,0,0.5)}
+/* Footer */
+footer{border-top:1px solid var(--border);padding:80px 0 32px}
+.footer-grid{display:grid;gap:40px;grid-template-columns:1fr}
+@media(min-width:768px){.footer-grid{grid-template-columns:2fr 1fr 1fr 1fr}}
+.footer-col h4{font-family:var(--font-h);font-size:14px;margin-bottom:16px;color:var(--text)}
+.footer-col a{display:block;font-size:13px;color:var(--text2);margin-bottom:10px;transition:color .3s}
+.footer-col a:hover{color:var(--text)}
+.footer-col .socials{display:flex;gap:16px;margin-top:16px}
+.footer-col .socials a{font-size:18px}
+.footer-bottom{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px;margin-top:48px;padding-top:24px;border-top:1px solid var(--border);font-size:12px;color:var(--text2)}
+.footer-bottom .love{font-style:italic}
+/* Mobile bottom CTA */
+.mobile-cta{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;z-index:100;transform:translateY(100%);transition:transform .4s}
+.mobile-cta.visible{transform:translateY(0)}
+.mobile-cta .close-bar{background:none;border:none;color:var(--text2);font-size:18px;cursor:pointer}
+/* Fire cursor */
+.fire-cursor{position:fixed;width:8px;height:8px;background:var(--accent);border-radius:50%;pointer-events:none;z-index:999;mix-blend-mode:screen;transition:opacity .2s;opacity:0}
+body:hover .fire-cursor{opacity:1}
+/* Reduced motion */
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}.reveal{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<!-- PROGRESS BAR -->
+<div id="progress"></div>
+<!-- FIRE CURSOR -->
+<div class="fire-cursor" id="cursor"></div>
+<!-- NAV -->
+<nav id="nav" aria-label="Main navigation">
+<div class="nav-inner">
+<div class="logo"><span>ADV</span>RIDER<small>Ride. Survive. Explore.</small></div>
+<ul class="nav-links">
+<li><a href="#hero" class="active">Home</a></li>
+<li><a href="#features">Features</a></li>
+<li><a href="#safety">Safety</a></li>
+<li><a href="#community">Community</a></li>
+<li><a href="#download">Download</a></li>
+<li><a href="#pricing">Pricing</a></li>
+</ul>
+<a href="#download" class="btn btn-primary nav-cta">Get Early Access</a>
+<button class="hamburger" id="hamburger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+</div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+<a href="#hero">Home</a><a href="#features">Features</a><a href="#safety">Safety</a><a href="#community">Community</a><a href="#download">Download</a><a href="#pricing">Pricing</a>
+</div>
+<!-- PLACEHOLDER BODY - SECTIONS ADDED NEXT -->
+<main>
+<section class="hero" id="hero">
+<div class="hero-grid"></div>
+<div class="container hero-content">
+<div class="hero-text reveal">
+<span class="hero-pill">Beta · Limited Access</span>
+<h1>RIDE<br>WITHOUT<br><em>LIMITS.</em></h1>
+<p class="hero-sub" id="typewriter"></p>
+<div class="hero-ctas"><a href="#download" class="btn btn-primary"><i class="fa-solid fa-download"></i> Download Beta</a><a href="#dashboard" class="btn btn-ghost"><i class="fa-solid fa-play"></i> Watch the ride</a></div>
+<div class="hero-stats"><div class="stat"><strong id="c1">0</strong>12,400+ riders beta listed</div><div class="stat"><strong id="c2">0</strong>29 survival features</div><div class="stat"><strong id="c3">0</strong>Works offline at 0 bars</div></div>
+</div>
+<div class="hero-visual reveal">
+<div class="phone-mock">
+<svg class="route" width="200" height="300" viewBox="0 0 200 300"><path d="M30 280 Q60 200 100 180 Q140 160 120 100 Q100 40 160 20" stroke="#FF4500" stroke-width="2" fill="none" stroke-dasharray="500" stroke-dashoffset="500" class="anim-route"/></svg>
+<div class="dot"></div>
+<div class="notif">SOS Sent ✓</div>
+<div class="notif">Flat tyre — mechanic 2.1km</div>
+<div class="notif">🌧 Rain in 20 min</div>
+</div>
+</div>
+</div>
+<span class="section-num">01</span>
+</section>
+<div class="section-line"></div>
+
+<section id="problems">
+<div class="container">
+<span class="section-num">02</span>
+<p class="eyebrow reveal">THE REAL PROBLEMS</p>
+<h2 class="reveal">Every ADV rider has been here</h2>
+<div class="problems-grid">
+<div class="card problem-card reveal"><div class="icon"><i class="fa-solid fa-signal"></i></div><h3>No signal, no help</h3><p>You break down 80km from the nearest town. Zero network. No way to call anyone. You're on your own.</p><a class="fix" href="#features">Our fix →</a></div>
+<div class="card problem-card reveal"><div class="icon"><i class="fa-solid fa-route"></i></div><h3>Google Maps sends you to highways</h3><p>You wanted the mountain pass. Maps routed you through a 6-lane highway with trucks. That's not adventure.</p><a class="fix" href="#features">Our fix →</a></div>
+<div class="card problem-card reveal"><div class="icon"><i class="fa-solid fa-tire-flat"></i></div><h3>Flat tyre, no clue what to do</h3><p>Puncture at 11pm on a ghat road. No repair kit knowledge. No mechanic within 50km. Total panic.</p><a class="fix" href="#features">Our fix →</a></div>
+<div class="card problem-card reveal"><div class="icon"><i class="fa-solid fa-indian-rupee-sign"></i></div><h3>Cheated by overpriced mechanics</h3><p>Roadside mechanic charges ₹3,000 for a ₹300 fix. No benchmark. No warning. You just pay and ride on.</p><a class="fix" href="#features">Our fix →</a></div>
+<div class="card problem-card reveal"><div class="icon"><i class="fa-solid fa-bed"></i></div><h3>Booked hotel won't take your bike</h3><p>"No parking for motorcycles." After 400km you're searching for a new stay at midnight.</p><a class="fix" href="#features">Our fix →</a></div>
+<div class="card problem-card reveal"><div class="icon"><i class="fa-solid fa-water"></i></div><h3>Riding into a flooded road</h3><p>No warnings. No updates. You ride straight into a waterlogged road that swallows your exhaust.</p><a class="fix" href="#features">Our fix →</a></div>
+</div>
+</div>
+</section>
+<div class="section-line"></div>
+
+<section id="features">
+<div class="container">
+<span class="section-num">03</span>
+<p class="eyebrow reveal">29 FEATURES. 5 CATEGORIES.</p>
+<h2 class="reveal">Everything a rider actually needs</h2>
+<div class="tabs reveal">
+<button class="tab-btn active" data-tab="safety-tab" aria-label="Safety features">Safety</button>
+<button class="tab-btn" data-tab="nav-tab" aria-label="Navigation features">Navigation</button>
+<button class="tab-btn" data-tab="mech-tab" aria-label="Mechanical features">Mechanical</button>
+<button class="tab-btn" data-tab="stays-tab" aria-label="Stays and Fuel features">Stays & Fuel</button>
+<button class="tab-btn" data-tab="comm-tab" aria-label="Community features">Community</button>
+</div>
+<div class="tab-panel active" id="safety-tab"><div class="features-grid">
+<div class="card feat-card"><span class="badge badge-p1">P1</span><h4><i class="fa-solid fa-circle-exclamation"></i> SOS Panic Button</h4><p class="prob"><b>The problem:</b> No way to alert anyone when you crash alone</p><p class="sol">One-tap SOS broadcasts GPS via SMS even without data</p></div>
+<div class="card feat-card"><span class="badge badge-p1">P1</span><h4><i class="fa-solid fa-car-burst"></i> Crash Detection Auto-Alert</h4><p class="prob"><b>The problem:</b> You're unconscious after a fall, no one knows</p><p class="sol">Gyroscope + accelerometer detect impact, 30s countdown then auto-alert</p></div>
+<div class="card feat-card"><span class="badge badge-p1">P1</span><h4><i class="fa-solid fa-hospital"></i> Hospital & Trauma Locator</h4><p class="prob"><b>The problem:</b> Nearest hospital is unknown in remote areas</p><p class="sol">Offline database of trauma centres, blood banks, and clinics</p></div>
+<div class="card feat-card"><span class="badge badge-p2">P2</span><h4><i class="fa-solid fa-eye"></i> Rider Fatigue Alert</h4><p class="prob"><b>The problem:</b> Drowsy riding kills more than speed</p><p class="sol">Time-based alerts with rest stop suggestions every 2 hours</p></div>
+<div class="card feat-card"><span class="badge badge-p2">P2</span><h4><i class="fa-solid fa-triangle-exclamation"></i> Real-time Road Hazard Alerts</h4><p class="prob"><b>The problem:</b> No warning for landslides, floods, or gravel</p><p class="sol">Community-reported hazards synced before every ride</p></div>
+<div class="card feat-card"><span class="badge badge-p2">P2</span><h4><i class="fa-solid fa-moon"></i> Night Riding Mode</h4><p class="prob"><b>The problem:</b> Bright screens destroy night vision</p><p class="sol">Ultra-dim red UI mode for night riding visibility</p></div>
+</div></div>
+<div class="tab-panel" id="nav-tab"><div class="features-grid">
+<div class="card feat-card"><span class="badge badge-p1">P1</span><h4><i class="fa-solid fa-wifi-slash"></i> 100% Offline Navigation</h4><p class="prob"><b>The problem:</b> Maps die when signal dies</p><p class="sol">Full turn-by-turn navigation with zero connectivity needed</p></div>
+<div class="card feat-card"><span class="badge badge-p1">P1</span><h4><i class="fa-solid fa-mountain"></i> ADV-Specific Route Builder</h4><p class="prob"><b>The problem:</b> Regular maps optimize for cars, not bikes</p><p class="sol">Routes optimized for adventure — trails, passes, scenic roads</p></div>
+<div class="card feat-card"><span class="badge badge-p1">P1</span><h4><i class="fa-solid fa-road"></i> Live Road Condition Reports</h4><p class="prob"><b>The problem:</b> No idea if a road is rideable until you're on it</p><p class="sol">Real-time rider-reported conditions updated hourly</p></div>
+<div class="card feat-card"><span class="badge badge-p2">P2</span><h4><i class="fa-solid fa-cloud-sun"></i> Weather & Road Overlay</h4><p class="prob"><b>The problem:</b> Weather apps don't show route-specific forecasts</p><p class="sol">Weather layer on your exact route, hour by hour</p></div>
+<div class="card feat-card"><span class="badge badge-p2">P2</span><h4><i class="fa-solid fa-passport"></i> Permit & Border Tracker</h4><p class="prob"><b>The problem:</b> Forgot your inner line permit for Ladakh</p><p class="sol">Auto-reminds permits, documents, and border requirements</p></div>
+<div class="card feat-card"><span class="badge badge-p3">P3</span><h4><i class="fa-solid fa-calculator"></i> Toll & Tax Calculator</h4><p class="prob"><b>The problem:</b> Surprise tolls drain your cash reserves</p><p class="sol">Pre-calculates all tolls and state taxes on your route</p></div>
+</div></div>
+<div class="tab-panel" id="mech-tab"><div class="features-grid">
+<div class="card feat-card"><span class="badge badge-p1">P1</span><h4><i class="fa-solid fa-wrench"></i> Roadside Mechanic Finder</h4><p class="prob"><b>The problem:</b> Breakdown in the middle of nowhere</p><p class="sol">Offline database of verified mechanics with fair pricing</p></div>
+<div class="card feat-card"><span class="badge badge-p1">P1</span><h4><i class="fa-solid fa-life-ring"></i> Flat Tyre Emergency Guide</h4><p class="prob"><b>The problem:</b> Never plugged a tyre in your life</p><p class="sol">Step-by-step video guide for your exact bike model</p></div>
+<div class="card feat-card"><span class="badge badge-p2">P2</span><h4><i class="fa-solid fa-oil-can"></i> Service & Maintenance Tracker</h4><p class="prob"><b>The problem:</b> Forgot when your last oil change was</p><p class="sol">Auto-tracks service intervals, chain lube, tyre pressure</p></div>
+<div class="card feat-card"><span class="badge badge-p2">P2</span><h4><i class="fa-solid fa-truck-pickup"></i> Recovery & Towing Connect</h4><p class="prob"><b>The problem:</b> Bike won't start and you need a tow</p><p class="sol">One-tap connect to nearest verified recovery service</p></div>
+<div class="card feat-card"><span class="badge badge-p2">P2</span><h4><i class="fa-solid fa-gears"></i> Spare Parts Availability Map</h4><p class="prob"><b>The problem:</b> Need a clutch cable 200km from a city</p><p class="sol">Map of parts shops with stock info for popular ADV bikes</p></div>
+<div class="card feat-card"><span class="badge badge-p3">P3</span><h4><i class="fa-solid fa-hands-helping"></i> Community Mechanic Help</h4><p class="prob"><b>The problem:</b> No mechanic nearby but another rider might know</p><p class="sol">Broadcast repair help requests to nearby community riders</p></div>
+</div></div>
+<div class="tab-panel" id="stays-tab"><div class="features-grid">
+<div class="card feat-card"><span class="badge badge-p1">P1</span><h4><i class="fa-solid fa-gas-pump"></i> Fuel Range Calculator</h4><p class="prob"><b>The problem:</b> Will I make it to the next pump?</p><p class="sol">Real-time range based on your bike, terrain, and riding style</p></div>
+<div class="card feat-card"><span class="badge badge-p1">P1</span><h4><i class="fa-solid fa-hotel"></i> Biker-Friendly Stay Finder</h4><p class="prob"><b>The problem:</b> Hotels that refuse motorcycle parking</p><p class="sol">3,400+ verified stays with secure parking, rated by riders</p></div>
+<div class="card feat-card"><span class="badge badge-p2">P2</span><h4><i class="fa-solid fa-campground"></i> Camp & Wild Stay Finder</h4><p class="prob"><b>The problem:</b> Want to camp but don't know safe spots</p><p class="sol">Community-mapped camping spots with safety ratings</p></div>
+<div class="card feat-card"><span class="badge badge-p2">P2</span><h4><i class="fa-solid fa-utensils"></i> Rider Dhaba & Food Stops</h4><p class="prob"><b>The problem:</b> Hungry at 2am on NH-44, everything's closed</p><p class="sol">24/7 dhabas and food stops verified by riders</p></div>
+<div class="card feat-card"><span class="badge badge-p2">P2</span><h4><i class="fa-solid fa-money-bill"></i> ATM & Cash Zone Map</h4><p class="prob"><b>The problem:</b> UPI doesn't work at remote fuel stations</p><p class="sol">Working ATMs mapped and verified weekly by community</p></div>
+</div></div>
+<div class="tab-panel" id="comm-tab"><div class="features-grid">
+<div class="card feat-card"><span class="badge badge-p2">P2</span><h4><i class="fa-solid fa-language"></i> Local Language Phrasebook</h4><p class="prob"><b>The problem:</b> Can't communicate in rural Meghalaya</p><p class="sol">Essential phrases in 22 Indian languages, works offline</p></div>
+<div class="card feat-card"><span class="badge badge-p2">P2</span><h4><i class="fa-solid fa-flag"></i> Scam & Touting Alert Map</h4><p class="prob"><b>The problem:</b> Tourist traps charging 5x for chai</p><p class="sol">Community-flagged scam zones with fair price benchmarks</p></div>
+<div class="card feat-card"><span class="badge badge-p1">P1</span><h4><i class="fa-solid fa-users"></i> Group Ride Coordinator</h4><p class="prob"><b>The problem:</b> Herding 8 riders is impossible</p><p class="sol">Live location, waypoints, and group alerts in one dashboard</p></div>
+<div class="card feat-card"><span class="badge badge-p2">P2</span><h4><i class="fa-solid fa-book"></i> Auto Ride Journal</h4><p class="prob"><b>The problem:</b> Too busy riding to document the trip</p><p class="sol">Auto-logs route, speed, altitude, and stops hands-free</p></div>
+<div class="card feat-card"><span class="badge badge-p2">P2</span><h4><i class="fa-solid fa-id-card"></i> Legal & Doc Wallet</h4><p class="prob"><b>The problem:</b> Left your RC at home, cop pulls you over</p><p class="sol">Digital vault for license, RC, insurance, and permits</p></div>
+<div class="card feat-card"><span class="badge badge-p3">P3</span><h4><i class="fa-solid fa-star"></i> Infrastructure Quality Ratings</h4><p class="prob"><b>The problem:</b> Is that bridge safe for a loaded ADV?</p><p class="sol">Community-rated roads, bridges, and infrastructure quality</p></div>
+</div></div>
+</div>
+</section>
+<div class="section-line"></div>
+
+<section id="dashboard" style="background:#060606">
+<div class="container">
+<span class="section-num">04</span>
+<p class="eyebrow reveal">LIVE DASHBOARD</p>
+<h2 class="reveal">See it in action</h2>
+<div class="dashboard-layout reveal">
+<div class="fake-map"><div class="grid-lines"></div><svg class="map-route" width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="none"><path d="M40 260 Q100 180 180 160 Q260 140 300 80 Q340 20 380 40" stroke="#FF4500" stroke-width="2" fill="none" stroke-dasharray="600" stroke-dashoffset="600" class="anim-route"/><polygon points="140,120 136,128 144,128" fill="#FF4500" opacity="0.8"/><polygon points="240,90 236,98 244,98" fill="#FF4500" opacity="0.8"/><polygon points="320,180 316,188 324,188" fill="#FF4500" opacity="0.8"/></svg><div class="map-dot"></div></div>
+<div class="stat-cards">
+<div class="card stat-card"><div class="label">Current Speed</div><div class="value" id="speedCounter">68 km/h</div></div>
+<div class="card stat-card"><div class="label">To destination</div><div class="value cyan">124 km</div></div>
+<div class="card stat-card"><div class="label">Altitude</div><div class="value">847m</div></div>
+<div class="card stat-card" style="border-color:rgba(255,69,0,0.3)"><div class="label" style="color:var(--accent)">⚠ Hazard ahead</div><div style="font-size:14px;color:var(--text2)">Loose gravel — 2.3km ahead — reported 12min ago</div></div>
+<div class="card stat-card" style="border-color:rgba(34,197,94,0.3)"><div class="label" style="color:#22c55e">✓ Fuel range OK</div><div style="font-size:14px;color:var(--text2)">Next station: 34km · Current range: 180km</div></div>
+</div>
+</div>
+<div class="callouts reveal">
+<div class="card callout"><i class="fa-solid fa-wifi-slash"></i><h4>Offline-first</h4><p>Every feature works without internet. Sync when you can.</p></div>
+<div class="card callout"><i class="fa-solid fa-users"></i><h4>Squad tracking</h4><p>See your entire group on one map in real time.</p></div>
+<div class="card callout"><i class="fa-solid fa-car-burst"></i><h4>Crash detection</h4><p>Auto-alerts emergency contacts if you go down.</p></div>
+</div>
+</div>
+</section>
+<div class="section-line"></div>
+
+<section id="safety" style="background:#060606">
+<div class="container">
+<span class="section-num">05</span>
+<p class="eyebrow reveal">SAFETY FIRST</p>
+<h2 class="reveal">Built for the worst case scenario</h2>
+<div class="safety-layout reveal">
+<div style="text-align:center"><div class="sos-btn" aria-label="SOS Button demonstration">SOS</div><p style="color:var(--text2);font-size:14px;max-width:320px;margin:0 auto">Hold 3 seconds to broadcast your last GPS location via SMS — even with 0 bars</p></div>
+<div class="safety-cards">
+<div class="card"><h3 style="font-family:var(--font-h);margin-bottom:8px"><i class="fa-solid fa-car-burst" style="color:var(--accent);margin-right:8px"></i>Crash Detection</h3><p style="color:var(--text2);font-size:14px">Gyroscope + accelerometer detect sudden impact. 30-second countdown with loud alarm. If you don't cancel, SOS fires automatically to all emergency contacts.</p></div>
+<div class="card"><h3 style="font-family:var(--font-h);margin-bottom:8px"><i class="fa-solid fa-hospital" style="color:var(--accent);margin-right:8px"></i>Hospital Locator</h3><p style="color:var(--text2);font-size:14px">Offline database of 12,000+ hospitals, trauma centres, and blood banks across India. Works without internet. Shows distance, bed availability, and trauma grade.</p></div>
+<div class="card"><h3 style="font-family:var(--font-h);margin-bottom:8px"><i class="fa-solid fa-people-group" style="color:var(--accent);margin-right:8px"></i>Group SOS</h3><p style="color:var(--text2);font-size:14px">Alerts your entire riding squad simultaneously with your GPS location, battery level, and last known speed. No one gets left behind.</p></div>
+</div>
+</div>
+</div>
+</section>
+<div class="section-line"></div>
+
+<section id="offline">
+<div class="container">
+<span class="section-num">06</span>
+<p class="eyebrow reveal">OFFLINE MAPS</p>
+<h2 class="reveal">Zero bars. Zero problems.</h2>
+<div class="offline-layout reveal">
+<div>
+<ul class="check-list">
+<li>Full turn-by-turn navigation</li>
+<li>Fuel stations, hospitals, mechanics</li>
+<li>Real-time hazard reports from pre-ride sync</li>
+<li>10,000+ ADV routes pre-loaded for India</li>
+</ul>
+<p style="color:var(--text2);font-size:14px;margin-bottom:24px">Region download: ~180MB for South India</p>
+<a href="#download" class="btn btn-primary"><i class="fa-solid fa-download"></i> Download Karnataka for free</a>
+</div>
+<div class="offline-map-card">
+<div class="grid-lines" style="position:absolute;inset:0;background:repeating-linear-gradient(transparent,transparent 40px,#1a2030 40px,#1a2030 41px),repeating-linear-gradient(90deg,transparent,transparent 40px,#1a2030 40px,#1a2030 41px)"></div>
+<span class="offline-badge">OFFLINE</span>
+<svg width="100%" height="100%" viewBox="0 0 300 300" style="position:relative;z-index:1"><path d="M40 260 Q80 180 150 150 Q220 120 260 50" stroke="#00CED1" stroke-width="2" fill="none" stroke-dasharray="400" stroke-dashoffset="400" class="anim-route"/><circle cx="80" cy="200" r="5" fill="#22c55e"/><text x="92" y="204" fill="#22c55e" font-size="10">Fuel</text><circle cx="180" cy="130" r="5" fill="#FF4500"/><text x="192" y="134" fill="#FF4500" font-size="10">Mechanic</text><circle cx="250" cy="60" r="5" fill="#00CED1"/><text x="230" y="50" fill="#00CED1" font-size="10">Hospital</text></svg>
+<div style="position:absolute;bottom:16px;left:16px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)"><span style="display:flex;gap:2px"><span style="width:4px;height:12px;background:#333;border-radius:1px"></span><span style="width:4px;height:12px;background:#333;border-radius:1px"></span><span style="width:4px;height:12px;background:#333;border-radius:1px"></span><span style="width:4px;height:12px;background:#333;border-radius:1px"></span></span> App works anyway</div>
+</div>
+</div>
+</div>
+</section>
+<div class="section-line"></div>
+
+<section id="group" style="background:#0a0a0a">
+<div class="container">
+<span class="section-num">07</span>
+<p class="eyebrow reveal">GROUP RIDE</p>
+<h2 class="reveal">Your squad. One map.</h2>
+<div class="group-layout reveal">
+<div>
+<div class="group-feat"><h4><i class="fa-solid fa-location-dot"></i> Live location sharing</h4><p>See every rider's position updated every 5 seconds on a shared map.</p></div>
+<div class="group-feat"><h4><i class="fa-solid fa-gauge-high"></i> Speed & distance sync</h4><p>Know who's ahead, who's behind, and who stopped for chai.</p></div>
+<div class="group-feat"><h4><i class="fa-solid fa-bell"></i> Group SOS broadcast</h4><p>One tap alerts every rider in your squad with your GPS pin.</p></div>
+</div>
+<div class="squad-map">
+<div class="rider-dot" style="background:#FF4500;top:30%;left:40%">RK</div>
+<div class="rider-dot" style="background:#00CED1;top:50%;left:55%">SP</div>
+<div class="rider-dot" style="background:#FFD700;top:35%;left:65%">AM</div>
+<div class="rider-dot" style="background:#22c55e;top:60%;left:35%">VK</div>
+<svg width="100%" height="100%" style="position:absolute;inset:0"><line x1="40%" y1="30%" x2="55%" y2="50%" stroke="rgba(255,255,255,0.1)" stroke-dasharray="4"/><line x1="55%" y1="50%" x2="65%" y2="35%" stroke="rgba(255,255,255,0.1)" stroke-dasharray="4"/><line x1="35%" y1="60%" x2="40%" y2="30%" stroke="rgba(255,255,255,0.1)" stroke-dasharray="4"/></svg>
+</div>
+<div>
+<div class="group-feat"><h4><i class="fa-solid fa-map-pin"></i> Drop-pin meeting points</h4><p>Set rally points that everyone can navigate to independently.</p></div>
+<div class="group-feat"><h4><i class="fa-solid fa-comment"></i> In-app group chat</h4><p>Text your squad without leaving the navigation screen.</p></div>
+<div class="group-feat"><h4><i class="fa-solid fa-satellite-dish"></i> Last-known location</h4><p>If a rider loses signal, their last position stays on your map.</p></div>
+</div>
+</div>
+<p class="reveal" style="text-align:center;color:var(--text2);font-size:14px;margin-top:40px">Group ride mode is always free. No subscription needed.</p>
+</div>
+</section>
+<div class="section-line"></div>
+
+<section id="journal">
+<div class="container">
+<span class="section-num">08</span>
+<p class="eyebrow reveal">RIDE JOURNAL</p>
+<h2 class="reveal">Every ride, remembered forever</h2>
+<div class="journal-layout reveal">
+<div>
+<div class="phone-journal">
+<div class="trip-name">Coorg to Wayanad</div>
+<div class="trip-date">March 14, 2026 · 2 days</div>
+<div class="route-thumb"></div>
+<div class="stats-row"><div><strong>342</strong>km</div><div><strong>2,180</strong>m elev.</div><div><strong>8h 24m</strong>time</div><div><strong>52</strong>avg km/h</div></div>
+<div class="photos"><div style="background:#2d4a3e;border-radius:6px"></div><div style="background:#4a3a2d;border-radius:6px"></div><div style="background:#2d3a4a;border-radius:6px"></div></div>
+<div class="badges-row"><span>🏔 Ghat Slayer</span><span>🌧 Monsoon Warrior</span><span>🏍 500km Club</span></div>
+</div>
+</div>
+<div class="journal-feats">
+<div class="jf"><i class="fa-solid fa-circle-play"></i><div><h4>Auto-records everything</h4><p>Route, speed, altitude, fuel stops — all logged without touching your phone.</p></div></div>
+<div class="jf"><i class="fa-solid fa-microphone"></i><div><h4>Voice notes hands-free</h4><p>Record thoughts while riding via Bluetooth headset. Tagged to GPS location.</p></div></div>
+<div class="jf"><i class="fa-solid fa-share-nodes"></i><div><h4>Auto-generates trip story</h4><p>Beautiful shareable trip summary with maps, stats, and photos.</p></div></div>
+<div class="jf"><i class="fa-solid fa-file-pdf"></i><div><h4>Export as PDF or share</h4><p>Download your journal or share directly to Instagram and the ADV Rider community.</p></div></div>
+</div>
+</div>
+<p class="reveal" style="text-align:center;color:var(--text2);font-size:14px;margin-top:40px">Join 12,400 riders already journaling their rides</p>
+</div>
+</section>
+<div class="section-line"></div>
+
+<section id="community">
+<div class="container">
+<span class="section-num">09</span>
+<p class="eyebrow reveal">COMMUNITY</p>
+<h2 class="reveal">The living map only riders can build</h2>
+<div class="community-cards reveal">
+<div class="card comm-card"><i class="fa-solid fa-triangle-exclamation"></i><h3>Report a hazard</h3><p>Your report protects the next rider on that road. Landslide, pothole, flood — one tap to warn thousands.</p></div>
+<div class="card comm-card"><i class="fa-solid fa-star"></i><h3>Rate a stay</h3><p>3,400+ biker-friendly stays already rated. Add yours. Help the next rider find safe parking at midnight.</p></div>
+<div class="card comm-card"><i class="fa-solid fa-flag"></i><h3>Flag a scam</h3><p>Community-powered price benchmarks. Know the fair rate before you pay. Protect the next rider from overcharging.</p></div>
+</div>
+<div class="big-stats reveal">
+<div class="bs"><div class="num" data-target="12400">0</div><div class="lbl">Beta riders</div></div>
+<div class="bs"><div class="num" data-target="3400">0</div><div class="lbl">Stays rated</div></div>
+<div class="bs"><div class="num" data-target="18000">0</div><div class="lbl">Hazard reports</div></div>
+<div class="bs"><div class="num" data-target="140">0</div><div class="lbl">ADV routes mapped</div></div>
+</div>
+</div>
+</section>
+<div class="section-line"></div>
+
+<section id="pricing">
+<div class="container">
+<span class="section-num">10</span>
+<p class="eyebrow reveal">PRICING</p>
+<h2 class="reveal">Simple, rider-friendly pricing</h2>
+<div class="toggle-wrap reveal"><span class="active" id="monthlyLabel">Monthly</span><div class="toggle" id="pricingToggle" role="switch" aria-label="Toggle annual pricing"></div><span id="annualLabel">Annual <span style="color:var(--accent);font-size:12px">(save 37%)</span></span></div>
+<div class="pricing-grid reveal">
+<div class="card price-card">
+<h3>Free</h3>
+<div class="price">₹0</div>
+<div class="period">forever</div>
+<ul><li>Offline maps (1 region)</li><li>Basic navigation</li><li>SOS button</li><li>Road condition reports</li><li>Group ride (up to 3)</li><li>Basic journal</li></ul>
+<a href="#download" class="btn btn-ghost" style="width:100%;justify-content:center">Start free</a>
+</div>
+<div class="card price-card featured">
+<span class="popular">Most popular</span>
+<h3>Pro</h3>
+<div class="price" id="proPrice">₹199<span style="font-size:16px;font-weight:400">/mo</span></div>
+<div class="period" id="proPeriod">or ₹1,499/year (save 37%)</div>
+<ul><li>Unlimited offline maps</li><li>ADV route builder</li><li>Weather overlay</li><li>AI route suggestions</li><li>Unlimited squad</li><li>Full journal + export</li><li>Priority SOS</li><li>All 29 features</li></ul>
+<a href="#download" class="btn btn-primary" style="width:100%;justify-content:center">Go Pro</a>
+</div>
+<div class="card price-card">
+<h3>Clubs</h3>
+<div class="price">₹799<span style="font-size:16px;font-weight:400">/mo</span></div>
+<div class="period">per club</div>
+<ul><li>Everything in Pro</li><li>Up to 50 members</li><li>Club leaderboards</li><li>Group analytics</li><li>Dedicated support</li></ul>
+<a href="#download" class="btn btn-ghost" style="width:100%;justify-content:center">Contact us</a>
+</div>
+</div>
+<p class="reveal" style="text-align:center;color:var(--text2);font-size:13px;margin-top:32px">All plans include: Offline SOS, crash detection, and basic navigation — always free</p>
+</div>
+</section>
+<div class="section-line"></div>
+
+<section id="download" class="cta-section">
+<div class="container">
+<h2>Your next ride starts here.</h2>
+<p>Join 12,400+ riders on the beta list. iOS and Android.</p>
+<div class="store-btns">
+<a href="#" class="store-btn" aria-label="Download on App Store"><i class="fa-brands fa-apple"></i><div><small style="font-size:10px;opacity:0.7">Download on the</small><br>App Store</div></a>
+<a href="#" class="store-btn" aria-label="Get it on Google Play"><i class="fa-brands fa-google-play"></i><div><small style="font-size:10px;opacity:0.7">Get it on</small><br>Google Play</div></a>
+</div>
+<p class="cta-note">Early access. Free during beta. No credit card.</p>
+</div>
+</section>
+</main>
+
+<footer id="footer">
+<div class="container">
+<div class="footer-grid">
+<div class="footer-col">
+<div class="logo" style="margin-bottom:12px"><span>ADV</span>RIDER</div>
+<p style="font-size:13px;color:var(--text2);margin-bottom:16px">Built by riders, for riders. The adventure motorcycle app that works when nothing else does.</p>
+<div class="socials"><a href="#" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a><a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a><a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a></div>
+</div>
+<div class="footer-col"><h4>Features</h4><a href="#safety">Safety</a><a href="#features">Navigation</a><a href="#features">Mechanical</a><a href="#features">Stays & Fuel</a><a href="#community">Community</a><a href="#pricing">Pricing</a></div>
+<div class="footer-col"><h4>Company</h4><a href="#">About</a><a href="#">Blog</a><a href="#">Press Kit</a><a href="#">Careers</a><a href="#">Contact</a></div>
+<div class="footer-col"><h4>Legal</h4><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Cookie Policy</a></div>
+</div>
+<div class="footer-bottom">
+<span>© 2026 ADV Rider Technologies Pvt. Ltd. Bengaluru, India</span>
+<span class="love">Made with ❤️ on a Royal Enfield Himalayan</span>
+</div>
+</div>
+</footer>
+
+<div class="mobile-cta" id="mobileCta"><a href="#download" class="btn btn-primary" style="flex:1;justify-content:center">Download Beta</a><button class="close-bar" aria-label="Close">&times;</button></div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
+
+// Scroll progress
+window.addEventListener('scroll',()=>{
+const h=document.documentElement.scrollHeight-window.innerHeight;
+$('#progress').style.width=(window.scrollY/h*100)+'%';
+});
+
+// Sticky nav
+const nav=$('#nav');
+window.addEventListener('scroll',()=>{nav.classList.toggle('scrolled',window.scrollY>50)});
+
+// Hamburger
+const ham=$('#hamburger'),mm=$('#mobileMenu');
+ham.addEventListener('click',()=>{ham.classList.toggle('open');mm.classList.toggle('open')});
+mm.querySelectorAll('a').forEach((a,i)=>{a.style.transitionDelay=i*80+'ms';a.addEventListener('click',()=>{ham.classList.remove('open');mm.classList.remove('open')})});
+
+// Tabs
+$$('.tab-btn').forEach(btn=>{btn.addEventListener('click',()=>{$$('.tab-btn').forEach(b=>b.classList.remove('active'));$$('.tab-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');$('#'+btn.dataset.tab).classList.add('active')})});
+
+// Pricing toggle
+const tog=$('#pricingToggle');
+tog.addEventListener('click',()=>{
+tog.classList.toggle('annual');
+const a=tog.classList.contains('annual');
+$('#proPrice').innerHTML=a?'₹1,499<span style="font-size:16px;font-weight:400">/yr</span>':'₹199<span style="font-size:16px;font-weight:400">/mo</span>';
+$('#proPeriod').textContent=a?'billed annually':'or ₹1,499/year (save 37%)';
+$('#monthlyLabel').classList.toggle('active',!a);$('#annualLabel').classList.toggle('active',a);
+});
+
+// Scroll reveal
+const obs=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}})},{threshold:0.1,rootMargin:'0px 0px -40px 0px'});
+$$('.reveal').forEach(el=>obs.observe(el));
+
+// Typewriter
+const txt="The first adventure bike app built by riders who've been stranded at 3am in Ladakh with a flat tyre and no signal.";
+let ti=0;function type(){if(ti<txt.length){$('#typewriter').textContent+=txt[ti];ti++;setTimeout(type,30)}}
+setTimeout(type,800);
+
+// Hero counters
+function countUp(el,target,suffix=''){let c=0;const step=Math.ceil(target/60);const iv=setInterval(()=>{c+=step;if(c>=target){c=target;clearInterval(iv)}el.textContent=c.toLocaleString()+suffix},25)}
+const heroObs=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting){countUp($('#c1'),12400,'+');countUp($('#c2'),29);countUp($('#c3'),0);$('#c3').textContent='0 bars';heroObs.unobserve(e.target)}})},{threshold:0.3});
+heroObs.observe($('.hero'));
+
+// Community stats counter
+const statObs=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting){$$('.big-stats .num').forEach(n=>{const t=parseInt(n.dataset.target);countUp(n,t,'+')});statObs.unobserve(e.target)}})},{threshold:0.3});
+const bs=$('.big-stats');if(bs)statObs.observe(bs);
+
+// Speed counter cycle
+const speeds=[68,72,55,63,70,58,66,74];let si=0;
+setInterval(()=>{si=(si+1)%speeds.length;const sc=$('#speedCounter');if(sc)sc.textContent=speeds[si]+' km/h'},1500);
+
+// Route animations
+const routeObs=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting){e.target.querySelectorAll('.anim-route').forEach(p=>{p.style.transition='stroke-dashoffset 2s ease';p.style.strokeDashoffset='0'});routeObs.unobserve(e.target)}})},{threshold:0.2});
+$$('section').forEach(s=>{if(s.querySelector('.anim-route'))routeObs.observe(s)});
+
+// Scroll spy
+const sections=$$('section[id]');const navLinks=$$('.nav-links a');
+window.addEventListener('scroll',()=>{let cur='';sections.forEach(s=>{if(window.scrollY>=s.offsetTop-200)cur=s.id});navLinks.forEach(a=>{a.classList.toggle('active',a.getAttribute('href')==='#'+cur)})});
+
+// Fire cursor (desktop only)
+if(!('ontouchstart' in window)){
+const c=$('#cursor');let mx=0,my=0,cx=0,cy=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});
+(function loop(){cx+=(mx-cx)*0.15;cy+=(my-cy)*0.15;c.style.left=cx+'px';c.style.top=cy+'px';requestAnimationFrame(loop)})();
+}
+
+// Mobile bottom CTA
+const mcta=$('#mobileCta');
+if(window.innerWidth<768){setTimeout(()=>mcta.classList.add('visible'),2000)}
+mcta.querySelector('.close-bar').addEventListener('click',()=>mcta.classList.remove('visible'));
+
+// Card grid hover spotlight
+const fg=$('.features-grid');
+if(fg){document.querySelectorAll('.features-grid').forEach(grid=>{grid.addEventListener('mousemove',e=>{const r=grid.getBoundingClientRect();grid.style.setProperty('--x',e.clientX-r.left+'px');grid.style.setProperty('--y',e.clientY-r.top+'px')});grid.style.position='relative';const overlay=document.createElement('div');overlay.style.cssText='position:absolute;inset:0;pointer-events:none;border-radius:16px;background:radial-gradient(300px circle at var(--x) var(--y),rgba(255,69,0,0.03),transparent);z-index:0;';grid.appendChild(overlay)})}
+
+// Parallax hero
+window.addEventListener('scroll',()=>{const hg=$('.hero-grid');if(hg)hg.style.transform='translateY('+window.scrollY*0.3+'px)'});
+
+})();
+</script>
+</body>
+</html>
