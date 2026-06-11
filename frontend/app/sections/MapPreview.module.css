@@ -1,0 +1,4 @@
+.mapWrap { border-radius: 16px; overflow: hidden; min-height: 500px; border: 1px solid var(--border); }
+.legend { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; margin-top: 24px; font-size: 13px; color: var(--text2); }
+.legend span { display: flex; align-items: center; gap: 6px; }
+.loading { min-height: 500px; display: flex; align-items: center; justify-content: center; background: var(--phone-bg); border-radius: 16px; color: var(--text2); font-size: 14px; }

@@ -1,0 +1,25 @@
+.hero { min-height: 100svh; display: flex; align-items: center; position: relative; overflow: hidden; padding-top: 100px; padding-bottom: 60px; }
+.content { position: relative; z-index: 1; display: grid; gap: 48px; }
+.text { max-width: 600px; }
+.pill { display: inline-flex; align-items: center; gap: 8px; background: var(--accent); color: var(--bg); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; padding: 8px 18px; border-radius: 20px; margin-bottom: 24px; }
+.accent { color: var(--accent); font-style: normal; }
+.sub { font-size: clamp(15px, 1.5vw, 18px); color: var(--text2); max-width: 480px; min-height: 60px; margin: 20px 0 32px; }
+.cursor { color: var(--accent); animation: blink 1s step-end infinite; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+.ctas { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 32px; }
+.stats { display: flex; gap: 32px; flex-wrap: wrap; }
+.stat { font-size: 13px; color: var(--text2); }
+.stat strong { color: var(--gold); font-size: 20px; font-weight: 800; font-family: var(--font-h); display: block; }
+.visual { display: flex; justify-content: center; }
+.phone { width: 280px; height: 520px; border: 2px solid var(--phone-border); border-radius: 36px; background: var(--phone-bg); position: relative; overflow: visible; }
+.phoneScreen { display: flex; align-items: center; justify-content: center; height: 100%; overflow: hidden; border-radius: 34px; }
+.notif { position: absolute; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 16px; font-size: 12px; white-space: nowrap; display: flex; align-items: center; gap: 8px; animation: bob 3s ease-in-out infinite; }
+.n1 { top: 10%; right: -60px; animation-delay: 0s; }
+.n2 { bottom: 35%; left: -50px; animation-delay: 0.5s; }
+.n3 { bottom: 10%; right: -40px; animation-delay: 1s; }
+
+@keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+@media (min-width: 768px) {
+  .content { grid-template-columns: 1fr 1fr; align-items: center; }
+}

@@ -1,0 +1,8 @@
+.cards { display: grid; gap: 24px; grid-template-columns: 1fr; }
+.stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 48px; text-align: center; }
+.num { font-size: clamp(28px, 4vw, 42px); font-weight: 800; font-family: var(--font-h); color: var(--gold); display: block; }
+.lbl { font-size: 13px; color: var(--text2); }
+@media (min-width: 768px) {
+  .cards { grid-template-columns: repeat(3, 1fr); }
+  .stats { grid-template-columns: repeat(4, 1fr); }
+}

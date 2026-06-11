@@ -1,0 +1,41 @@
+.features { display: grid; gap: 20px; grid-template-columns: 1fr; margin-bottom: 48px; }
+.feat { padding: 28px; }
+.feat h3 { margin: 16px 0 8px; font-size: 20px; }
+.feat p { color: var(--text2); font-size: 14px; line-height: 1.6; }
+.featIcon { width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; }
+
+/* Mini Dashboard */
+.miniDash { display: flex; gap: 16px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+.miniDash div { text-align: center; flex: 1; }
+.miniDash strong { font-family: var(--font-h); font-size: 22px; font-weight: 800; color: var(--accent); display: block; }
+.miniDash small { font-size: 11px; color: var(--text2); }
+
+/* Trip Demo */
+.tripDemo { margin-top: 16px; padding: 16px; background: var(--bg-stat-box); border-radius: 12px; }
+.tripPoint { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.tripPoint small { color: var(--text2); font-size: 11px; margin-left: 6px; }
+.tripLine { width: 2px; height: 20px; background: linear-gradient(var(--green), var(--accent)); margin-left: 3px; }
+.tripResult { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 13px; font-weight: 600; color: var(--gold); }
+
+/* Reminder List */
+.reminderList { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+.reminderItem { display: flex; align-items: center; gap: 10px; font-size: 14px; padding: 10px 14px; background: var(--bg-stat-box); border-radius: 8px; }
+.reminderItem small { color: var(--text2); font-size: 11px; margin-left: auto; }
+.reminderDot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.overdue { color: var(--red) !important; font-weight: 600; }
+.upcoming { color: var(--gold) !important; }
+
+/* Nearby Section */
+.nearbySection { margin-top: 16px; }
+.nearbyTitle { font-size: 24px; margin-bottom: 8px; }
+.nearbyGrid { display: grid; gap: 16px; grid-template-columns: 1fr; }
+.nearbyCard { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; transition: all 0.3s; }
+.nearbyCard:hover { border-color: var(--glow); transform: translateY(-2px); }
+.nearbyCard i { font-size: 24px; margin-bottom: 10px; display: block; }
+.nearbyCard strong { display: block; font-size: 15px; margin-bottom: 6px; }
+.nearbyCard p { color: var(--text2); font-size: 13px; line-height: 1.5; }
+
+@media (min-width: 768px) {
+  .features { grid-template-columns: repeat(3, 1fr); }
+  .nearbyGrid { grid-template-columns: repeat(3, 1fr); }
+}

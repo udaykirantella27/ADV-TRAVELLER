@@ -1,0 +1,90 @@
+.page { padding-top: 80px; min-height: 100vh; }
+.loading { text-align: center; padding: 80px 0; color: var(--text2); font-size: 16px; }
+.alertBanner { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); border-radius: 12px; padding: 16px 20px; margin-bottom: 16px; display: flex; align-items: center; gap: 14px; color: var(--red); }
+.alertBanner strong { display: block; color: var(--text); }
+.alertBanner span { font-size: 13px; color: var(--text2); }
+.warningBanner { background: rgba(255,215,0,0.08); border: 1px solid rgba(255,215,0,0.2); border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; display: flex; align-items: center; gap: 14px; color: var(--gold); }
+.warningBanner strong { display: block; color: var(--text); }
+.warningBanner span { font-size: 13px; color: var(--text2); }
+.header { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; margin-bottom: 32px; }
+.headerActions { display: flex; gap: 12px; }
+
+/* Bike Selector */
+.bikeSelector { display: flex; gap: 12px; overflow-x: auto; margin-bottom: 32px; padding-bottom: 8px; }
+.bikeCard { display: flex; align-items: center; gap: 12px; padding: 14px 20px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.3s; flex-shrink: 0; text-align: left; color: var(--text); font-family: var(--font-b); }
+.bikeCard strong { display: block; font-size: 14px; }
+.bikeCard small { color: var(--text2); font-size: 12px; }
+.bikeCard:hover { border-color: var(--glow); }
+.bikeActive { border-color: var(--accent); background: rgba(255,69,0,0.06); }
+.bikeBadge { background: var(--accent); color: var(--bg); padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; font-family: var(--font-h); margin-left: auto; }
+
+/* Tabs */
+.tabs { display: flex; gap: 4px; margin-bottom: 32px; background: var(--card); border-radius: 12px; padding: 4px; border: 1px solid var(--border); }
+.tab { flex: 1; padding: 12px; background: none; border: none; color: var(--text2); font-family: var(--font-h); font-size: 14px; cursor: pointer; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s; position: relative; }
+.tab:hover { color: var(--text); }
+.tabActive { background: var(--accent); color: var(--bg); }
+.alertDot { background: var(--red); color: white; font-size: 10px; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+/* Dashboard Grid */
+.dashGrid { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; }
+.statCard { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; text-align: center; transition: all 0.3s; }
+.statCard:hover { border-color: var(--glow); transform: translateY(-2px); }
+.bigStat { grid-column: 1 / -1; padding: 40px 24px; }
+.odoRing { width: 180px; height: 180px; border-radius: 50%; border: 4px solid var(--accent); display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 auto 16px; position: relative; box-shadow: 0 0 40px rgba(255,69,0,0.15); }
+.odoNum { font-family: var(--font-h); font-size: 36px; font-weight: 800; color: var(--text); }
+.odoUnit { font-size: 14px; color: var(--accent); font-weight: 700; }
+.odoLabel { font-size: 16px; color: var(--text); font-weight: 600; }
+.odoSub { font-size: 13px; color: var(--text2); margin-top: 4px; }
+.statIcon { font-size: 24px; color: var(--accent); margin-bottom: 8px; }
+.statVal { font-family: var(--font-h); font-size: 28px; font-weight: 800; color: var(--text); }
+.statLbl { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+/* Trip List */
+.tripList { display: flex; flex-direction: column; gap: 16px; }
+.tripCard { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; transition: border-color 0.3s; }
+.tripCard:hover { border-color: var(--glow); }
+.tripHeader { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 16px; }
+.tripHeader h3 { font-size: 18px; margin-top: 6px; }
+.tripRoute { font-size: 13px; color: var(--text2); margin-top: 4px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.tripStatus { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; }
+.tripActive { background: rgba(255,69,0,0.15); color: var(--accent); animation: pulse 2s infinite; }
+.tripDone { background: rgba(34,197,94,0.15); color: var(--green); }
+.tripStats { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 12px; }
+.tripStats div { text-align: center; padding: 8px; background: var(--bg-stat-box); border-radius: 8px; }
+.tripStats strong { display: block; font-family: var(--font-h); font-size: 18px; color: var(--text); }
+.tripStats small { font-size: 11px; color: var(--text2); }
+.tripNotes { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 13px; color: var(--text2); font-style: italic; }
+
+/* Service */
+.serviceList { display: flex; flex-direction: column; gap: 12px; }
+.serviceCard { display: flex; align-items: center; gap: 16px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; transition: all 0.3s; }
+.serviceCard:hover { border-color: var(--glow); }
+.svc_overdue { border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.04); }
+.svc_upcoming { border-color: rgba(255,215,0,0.3); background: rgba(255,215,0,0.03); }
+.svc_done { opacity: 0.5; }
+.svcIcon { width: 44px; height: 44px; border-radius: 12px; background: var(--accent-dim, rgba(255,69,0,0.1)); display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--accent); flex-shrink: 0; }
+.svcInfo { flex: 1; }
+.svcInfo h4 { font-size: 15px; margin-bottom: 2px; }
+.svcInfo p { font-size: 12px; color: var(--text2); }
+.svcMeta { display: flex; gap: 16px; margin-top: 6px; font-size: 12px; color: var(--text2); flex-wrap: wrap; }
+.svcBadge_overdue { color: var(--red); font-weight: 600; }
+.svcBadge_upcoming { color: var(--gold); font-weight: 600; }
+.svcBadge_ok { color: var(--green); }
+.svcBadge_done { color: var(--green); }
+.svcBtn { width: 36px; height: 36px; border-radius: 8px; background: var(--green); border: none; color: #080808; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s; }
+.svcBtn:hover { filter: brightness(1.2); }
+
+/* Modal */
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 500; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+.modal { background: var(--bg-elevated, #0d0d0d); border: 1px solid var(--border); border-radius: 16px; padding: 32px; max-width: 420px; width: 90%; }
+.modal h3 { margin-bottom: 16px; font-size: 20px; display: flex; align-items: center; gap: 10px; }
+.input { width: 100%; padding: 14px 16px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; font-family: var(--font-b); margin-bottom: 12px; outline: none; transition: border-color 0.3s; }
+.input:focus { border-color: var(--accent); }
+.textarea { width: 100%; padding: 14px 16px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; font-family: var(--font-b); margin-bottom: 12px; outline: none; resize: vertical; min-height: 80px; }
+.textarea:focus { border-color: var(--accent); }
+.modalBtns { display: flex; justify-content: flex-end; gap: 12px; margin-top: 8px; }
+
+@media (min-width: 768px) {
+  .dashGrid { grid-template-columns: repeat(4, 1fr); }
+  .bigStat { grid-column: 1 / 3; }
+}

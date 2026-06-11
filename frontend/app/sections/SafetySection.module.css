@@ -1,0 +1,6 @@
+.layout { display: grid; gap: 48px; }
+.sosWrap { text-align: center; }
+.sos { width: 180px; height: 180px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-family: var(--font-h); font-size: 48px; font-weight: 800; color: var(--bg); margin: 0 auto 24px; animation: sosPulse 2s infinite; cursor: pointer; }
+.sosText { color: var(--text2); font-size: 14px; max-width: 320px; margin: 0 auto; }
+.cards { display: flex; flex-direction: column; gap: 16px; }
+@media (min-width: 768px) { .layout { grid-template-columns: 1fr 1fr; } }
