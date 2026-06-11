@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import styles from './Footer.module.css';
+import SupabaseStatus from './SupabaseStatus';
 
 export default function Footer() {
   return (
@@ -40,9 +41,13 @@ export default function Footer() {
         </div>
         <div className={styles.bottom}>
           <span>© 2026 ADV Rider Technologies Pvt. Ltd. Bengaluru, India</span>
-          <span className={styles.love}>Made with ❤️ on a Royal Enfield Himalayan</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap' }}>
+            <SupabaseStatus />
+            <span className={styles.love}>Made with ❤️ on a Royal Enfield Himalayan</span>
+          </div>
         </div>
       </div>
     </footer>
   );
 }
+
